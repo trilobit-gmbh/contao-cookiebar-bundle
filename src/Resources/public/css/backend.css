@@ -1,0 +1,40 @@
+/**
+ * @file backend.css
+ * trilobit css files
+ *
+ * @author      Peter Adelmann
+ * @company     trilobit GmbH
+ * @team        Apache
+ * @email       peter.adelmann@trilobit.de
+ * @url         http://www.trilobit.de
+ *
+ * @version     2016-12-20_0815
+ *
+ * __update__: 201x-xx-xx / xx:xx:xx
+ */
+
+.inline div.theme-preview-container {
+    padding: 10px;
+    display: block;
+    position: relative;
+}
+
+.inline div.theme-preview-button {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
+.inline div.theme-preview-container p,
+.inline div.theme-preview-button p {
+    padding: 0;
+    margin: 0;
+    color: #fff;
+}
+.inline div.theme-preview-button p {
+    padding: 0;
+    margin: 0;
+    color: #000;
+}
