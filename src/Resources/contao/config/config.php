@@ -14,7 +14,7 @@
 $GLOBALS['TL_HOOKS']['generatePage'][] = array('Trilobit\CookiebarBundle\CookieBar', 'addCookieBar');
 
 
-define(TRILOBIT_COOKIEBAR_ASSETS, 'bundles/trilobitcookiebar/assets/build');
+define('TRILOBIT_COOKIEBAR_ASSETS', 'bundles/trilobitcookiebar/assets/build');
 
 
 /**
