@@ -33,6 +33,13 @@ $GLOBALS['TL_DCA']['tl_page']['palettes']['root'] = str_replace
     $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
 );
 
+$GLOBALS['TL_DCA']['tl_page']['palettes']['rootfallback'] = str_replace
+(
+    ';{dns_legend',
+    ';{cookiebar_legend},addCookieBar;{dns_legend',
+    $GLOBALS['TL_DCA']['tl_page']['palettes']['rootfallback']
+);
+
 
 /**
  * Fields

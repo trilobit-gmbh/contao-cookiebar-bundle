@@ -16,8 +16,11 @@
  */
 namespace Trilobit\CookiebarBundle;
 
+use Contao\Controller;
 use Contao\Frontend;
+use Contao\LayoutModel;
 use Contao\PageModel;
+use Contao\PageRegular;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -38,7 +41,7 @@ class CookieBar extends Frontend
     }
 
 
-    public function addCookieBar(PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular)
+    public function addCookieBar(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
     {
         $objParentPages = PageModel::findParentsById($objPage->id);
 
@@ -113,7 +116,7 @@ class CookieBar extends Frontend
 
         $GLOBALS['TL_HEAD']['cookieconsent'] = "<script>\n"
                 . "window.addEventListener(\"load\", function() {\n"
-                    . "window.cookieconsent.initialise(" . \Controller::replaceInsertTags(json_encode ($arrOptions)) . ");\n"
+                    . "window.cookieconsent.initialise(" . Controller::replaceInsertTags(json_encode ($arrOptions)) . ");\n"
                 . "});\n"
             . "</script>"
         ;
