@@ -1,128 +1,191 @@
 <?php
 
-/**
- * Contao Open Source CMS
- *
- * Copyright (C) 2005-2014 Leo Feyer
- *
- * @package   trilobit
- * @author    trilobit GmbH <http://www.trilobit.de>
- * @license   LPGL
- * @copyright trilobit GmbH
+/*
+ * @copyright  trilobit GmbH
+ * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
+ * @license    LGPL-3.0-or-later
+ * @link       http://github.com/trilobit-gmbh/contao-cookiebar-bundle
  */
 
 /**
- * Namespace
+ * Namespace.
  */
+
 namespace Trilobit\CookiebarBundle;
 
 use Contao\Controller;
 use Contao\Frontend;
-use Contao\LayoutModel;
 use Contao\PageModel;
-use Contao\PageRegular;
 use Symfony\Component\Yaml\Yaml;
 
-
+/**
+ * Class CookieBar.
+ */
 class CookieBar extends Frontend
 {
-
-    protected function getVendowDir()
+    /**
+     * @return mixed
+     */
+    public static function getConfigData()
     {
-        return dirname(dirname(__FILE__));
-    }
-
-
-    public function getConfigData()
-    {
-        $strYml = file_get_contents(self::getVendowDir() . '/../config/config.yml');
+        $strYml = file_get_contents(self::getVendowDir().'/../config/config.yml');
 
         return Yaml::parse($strYml)['trilobit']['cookiebar'];
     }
 
+    /**
+     * @param DataContainer $dc
+     *
+     * @return array
+     */
+    public static function getCookiebarPalette(\Contao\DataContainer $dc)
+    {
+        return array_keys(self::getConfigData()['palette']);
+    }
 
-    public function addCookieBar(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
+    /**
+     * @param DataContainer $dc
+     *
+     * @return array
+     */
+    public static function getCookiebarTheme(\Contao\DataContainer $dc)
+    {
+        return array_keys(self::getConfigData()['theme']);
+    }
+
+    /**
+     * @param DataContainer $dc
+     *
+     * @return array
+     */
+    public static function getCookiebarPosition(\Contao\DataContainer $dc)
+    {
+        return array_keys(self::getConfigData()['position']);
+    }
+
+    /**
+     * @param DataContainer $dc
+     *
+     * @return string
+     */
+    public static function previewPalette(\Contao\DataContainer $dc)
+    {
+        $arrData = self::getConfigData()['palette'][$dc->activeRecord->cookieBarPalette];
+
+        if ('custom' === $dc->activeRecord->cookieBarPalette) {
+            $arrData = [
+                'popup' => [
+                    'background' => '#'.deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[0].deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[1],
+                    'text' => '#'.deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[0].deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[1],
+                ],
+                'button' => [
+                    'background' => '#'.deserialize($dc->activeRecord->cookieBarPaletteButton, true)[0].deserialize($dc->activeRecord->cookieBarPaletteButton, true)[1],
+                    'text' => '#'.deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[0].deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[1],
+                ],
+            ];
+            //return '<p><span>' . $dc->activeRecord->cookieBarPalette . print_r($arrData,1) . '</span></p>';
+        }
+
+        return '<div>'
+            .'<div class="clr w50 wizard widget inline">'
+            .'<h3><label>'.$GLOBALS['TL_LANG']['tl_page']['cookieBarPalettePreview'][0].'</label></h3>'
+            .'<div class="theme-preview-container" style="background:'.$arrData['popup']['background'].'">'
+            .'<p style="color:'.$arrData['popup']['text'].'">'
+            .$dc->activeRecord->cookieBarMessage
+            .'</p>'
+            .'<div class="theme-preview-button" style="background:'.$arrData['button']['background'].'">'
+            .'<p style="color:'.$arrData['button']['text'].'">'
+            .$dc->activeRecord->cookieBarDismiss
+            .'</p>'
+            .'</div>'
+            .'</div>'
+            .'<p class="tl_help tl_tip" title="">'.$GLOBALS['TL_LANG']['tl_page']['cookieBarPalettePreview'][1].'</p>'
+            .'</div>'
+            .'</div>'
+            ;
+    }
+
+    public function addCookieBar(\Contao\PageModel $objPage, \Contao\LayoutModel $objLayout, \Contao\PageRegular $objPageRegular)
     {
         $objParentPages = PageModel::findParentsById($objPage->id);
 
         $arrRootPage = $objParentPages->last()->row();
 
-        if ($arrRootPage['addCookieBar'] == '')
-        {
+        if (empty($arrRootPage['addCookieBar'])) {
             return;
         }
 
-        $arrRootPage['cookieBarType']              = 'info';
-        $arrRootPage['cookieBarLayout']            = 'basic';
-        $arrRootPage['cookieBarCookieName']        = 'cookieconsent_status';
-        $arrRootPage['cookieBarCookiePath']        = '/';
-        $arrRootPage['cookieBarCookieDomain']      = '';
-        $arrRootPage['cookieBarCookieExpiryDays']  = $arrRootPage['cookieBarExpiryDays'];
+        $arrRootPage['cookieBarType'] = 'info';
+        $arrRootPage['cookieBarLayout'] = 'basic';
+        $arrRootPage['cookieBarCookieName'] = !empty($arrRootPage['cookieBarCookieName']) ? $arrRootPage['cookieBarCookieName'] : 'cookieconsent_status';
+        $arrRootPage['cookieBarCookiePath'] = !empty($arrRootPage['cookieBarCookiePath']) ? $arrRootPage['cookieBarCookiePath'] : '/';
+        $arrRootPage['cookieBarCookieDomain'] = !empty($arrRootPage['cookieBarCookieDomain']) ? $arrRootPage['cookieBarCookieDomain'] : '';
+        $arrRootPage['cookieBarCookieExpiryDays'] = !empty($arrRootPage['cookieBarCookieExpiryDays']) ? $arrRootPage['cookieBarCookieExpiryDays'] : '30';
 
-        $arrPalette = array();
+        $arrPalette = [];
 
-        $arrOptions = array(
+        $arrOptions = [
             'theme' => $arrRootPage['cookieBarTheme'],
-            'content' => array(
-                'header'  => $arrRootPage['cookieBarHeader'],
+            'content' => [
+                'header' => $arrRootPage['cookieBarHeader'],
                 'message' => $arrRootPage['cookieBarMessage'],
                 'dismiss' => $arrRootPage['cookieBarDismiss'],
-                'link'    => $arrRootPage['cookieBarLink'],
-                'close'   => $arrRootPage['cookieBarClose'],
-                'href'    => $arrRootPage['cookieBarHref'],
-            ),
-            'type'     => $arrRootPage['cookieBarType'],
-            'layout'   => $arrRootPage['cookieBarLayout'],
+                'link' => $arrRootPage['cookieBarLink'],
+                'close' => $arrRootPage['cookieBarClose'],
+                'href' => $arrRootPage['cookieBarHref'],
+            ],
+            'type' => $arrRootPage['cookieBarType'],
+            'layout' => $arrRootPage['cookieBarLayout'],
             'position' => $arrRootPage['cookieBarPosition'],
-            'cookie' => array(
-                'name'       => $arrRootPage['cookieBarCookieName'],
-                'path'       => $arrRootPage['cookieBarCookiePath'],
-                'domain'     => $arrRootPage['cookieBarCookieDomain'],
-                'expiryDays' => $arrRootPage['cookieBarCookieExpiryDays'],
-            ),
-        );
+            'cookie' => [
+                'name' => $arrRootPage['cookieBarCookieName'],
+                'path' => $arrRootPage['cookieBarCookiePath'],
+                'domain' => $arrRootPage['cookieBarCookieDomain'],
+                'expiryDays' => \intval($arrRootPage['cookieBarCookieExpiryDays'], 10),
+            ],
+        ];
 
-        if (   $arrRootPage['cookieBarPalette'] !== 'css'
-            && $arrRootPage['cookieBarPalette'] !== 'custom'
-        )
-        {
-            $arrPalette = CookieBar::getConfigData();
+        if ('css' !== $arrRootPage['cookieBarPalette']
+            && 'custom' !== $arrRootPage['cookieBarPalette']
+        ) {
+            $arrPalette = self::getConfigData();
             $arrOptions['palette'] = $arrPalette['palette'][$arrRootPage['cookieBarPalette']];
         }
 
-        if ($arrRootPage['cookieBarPalette'] === 'custom')
-        {
-            if ($arrRootPage['cookieBarPaletteBanner'] !== '')
-            {
-                $arrOptions['palette']['popup']['background'] = '#' . deserialize($arrRootPage['cookieBarPaletteBanner'])[0] . deserialize($arrRootPage['cookieBarPaletteBanner'])[1];
+        if ('custom' === $arrRootPage['cookieBarPalette']) {
+            if ('' !== $arrRootPage['cookieBarPaletteBanner']) {
+                $arrOptions['palette']['popup']['background'] = '#'.deserialize($arrRootPage['cookieBarPaletteBanner'])[0].deserialize($arrRootPage['cookieBarPaletteBanner'])[1];
             }
 
-            if ($arrRootPage['cookieBarPaletteBannerText'] !== '')
-            {
-                $arrOptions['palette']['popup']['text'] = '#' . deserialize($arrRootPage['cookieBarPaletteBannerText'])[0] . deserialize($arrRootPage['cookieBarPaletteBannerText'])[1];
+            if ('' !== $arrRootPage['cookieBarPaletteBannerText']) {
+                $arrOptions['palette']['popup']['text'] = '#'.deserialize($arrRootPage['cookieBarPaletteBannerText'])[0].deserialize($arrRootPage['cookieBarPaletteBannerText'])[1];
             }
 
-            if ($arrRootPage['cookieBarPaletteButton'] !== '')
-            {
-                $arrOptions['palette']['button']['background'] = '#' . deserialize($arrRootPage['cookieBarPaletteButton'])[0] . deserialize($arrRootPage['cookieBarPaletteButton'])[1];
+            if ('' !== $arrRootPage['cookieBarPaletteButton']) {
+                $arrOptions['palette']['button']['background'] = '#'.deserialize($arrRootPage['cookieBarPaletteButton'])[0].deserialize($arrRootPage['cookieBarPaletteButton'])[1];
             }
 
-            if ($arrRootPage['cookieBarPaletteButtonText'] !== '')
-            {
-                $arrOptions['palette']['button']['text'] = '#' . deserialize($arrRootPage['cookieBarPaletteButtonText'])[0] . deserialize($arrRootPage['cookieBarPaletteButtonText'])[1];
+            if ('' !== $arrRootPage['cookieBarPaletteButtonText']) {
+                $arrOptions['palette']['button']['text'] = '#'.deserialize($arrRootPage['cookieBarPaletteButtonText'])[0].deserialize($arrRootPage['cookieBarPaletteButtonText'])[1];
             }
         }
 
-
         $GLOBALS['TL_HEAD']['cookieconsent'] = "<script>\n"
-                . "window.addEventListener(\"load\", function() {\n"
-                    . "window.cookieconsent.initialise(" . Controller::replaceInsertTags(json_encode ($arrOptions)) . ");\n"
-                . "});\n"
-            . "</script>"
+            ."window.addEventListener(\"load\", function() {\n"
+            .'window.cookieconsent.initialise('.Controller::replaceInsertTags(json_encode($arrOptions)).");\n"
+            ."});\n"
+            .'</script>'
         ;
 
-        $GLOBALS['TL_CSS']['cookieconsent']        = TRILOBIT_COOKIEBAR_ASSETS . '/cookieconsent.min.css|static';
-        $GLOBALS['TL_JAVASCRIPT']['cookieconsent'] = TRILOBIT_COOKIEBAR_ASSETS . '/cookieconsent.min.js|static';
+        $GLOBALS['TL_CSS']['cookieconsent'] = TRILOBIT_COOKIEBAR_ASSETS.'/cookieconsent.min.css|static';
+        $GLOBALS['TL_JAVASCRIPT']['cookieconsent'] = TRILOBIT_COOKIEBAR_ASSETS.'/cookieconsent.min.js|static';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getVendowDir()
+    {
+        return \dirname(__DIR__);
     }
 }
-

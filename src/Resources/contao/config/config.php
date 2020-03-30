@@ -1,26 +1,22 @@
 <?php
 
-/**
- * Contao Open Source CMS
- *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @license LGPL-3.0+
+/*
+ * @copyright  trilobit GmbH
+ * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
+ * @license    LGPL-3.0-or-later
+ * @link       http://github.com/trilobit-gmbh/contao-cookiebar-bundle
  */
 
 /**
- * Register hook
+ * Register hook.
  */
-$GLOBALS['TL_HOOKS']['generatePage'][] = array('Trilobit\CookiebarBundle\CookieBar', 'addCookieBar');
-
+$GLOBALS['TL_HOOKS']['generatePage'][] = ['Trilobit\CookiebarBundle\CookieBar', 'addCookieBar'];
 
 define('TRILOBIT_COOKIEBAR_ASSETS', 'bundles/trilobitcookiebar/assets/build');
 
-
-/**
+/*
  * Add css
  */
-if (TL_MODE == 'BE')
-{
+if (TL_MODE === 'BE') {
     $GLOBALS['TL_CSS'][] = 'bundles/trilobitcookiebar/css/backend.css';
 }
