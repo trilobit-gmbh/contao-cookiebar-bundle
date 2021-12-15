@@ -14,8 +14,12 @@
 namespace Trilobit\CookiebarBundle;
 
 use Contao\Controller;
+use Contao\DataContainer;
 use Contao\Frontend;
+use Contao\LayoutModel;
 use Contao\PageModel;
+use Contao\PageRegular;
+use Contao\StringUtil;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -28,59 +32,51 @@ class CookieBar extends Frontend
      */
     public static function getConfigData()
     {
-        $strYml = file_get_contents(self::getVendowDir().'/../config/config.yml');
+        $strYml = file_get_contents((new self())->getVendowDir().'/../config/config.yml');
 
         return Yaml::parse($strYml)['trilobit']['cookiebar'];
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
-    public static function getCookiebarPalette(\Contao\DataContainer $dc)
+    public static function getCookiebarPalette(DataContainer $dc)
     {
         return array_keys(self::getConfigData()['palette']);
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
-    public static function getCookiebarTheme(\Contao\DataContainer $dc)
+    public static function getCookiebarTheme(DataContainer $dc)
     {
         return array_keys(self::getConfigData()['theme']);
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
-    public static function getCookiebarPosition(\Contao\DataContainer $dc)
+    public static function getCookiebarPosition(DataContainer $dc)
     {
         return array_keys(self::getConfigData()['position']);
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return string
      */
-    public static function previewPalette(\Contao\DataContainer $dc)
+    public static function previewPalette(DataContainer $dc)
     {
         $arrData = self::getConfigData()['palette'][$dc->activeRecord->cookieBarPalette];
 
         if ('custom' === $dc->activeRecord->cookieBarPalette) {
             $arrData = [
                 'popup' => [
-                    'background' => '#'.deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[0].deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[1],
-                    'text' => '#'.deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[0].deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[1],
+                    'background' => '#'.StringUtil::deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[0].StringUtil::deserialize($dc->activeRecord->cookieBarPaletteBanner, true)[1],
+                    'text' => '#'.StringUtil::deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[0].StringUtil::deserialize($dc->activeRecord->cookieBarPaletteBannerText, true)[1],
                 ],
                 'button' => [
-                    'background' => '#'.deserialize($dc->activeRecord->cookieBarPaletteButton, true)[0].deserialize($dc->activeRecord->cookieBarPaletteButton, true)[1],
-                    'text' => '#'.deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[0].deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[1],
+                    'background' => '#'.StringUtil::deserialize($dc->activeRecord->cookieBarPaletteButton, true)[0].StringUtil::deserialize($dc->activeRecord->cookieBarPaletteButton, true)[1],
+                    'text' => '#'.StringUtil::deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[0].StringUtil::deserialize($dc->activeRecord->cookieBarPaletteButtonText, true)[1],
                 ],
             ];
             //return '<p><span>' . $dc->activeRecord->cookieBarPalette . print_r($arrData,1) . '</span></p>';
@@ -105,7 +101,7 @@ class CookieBar extends Frontend
             ;
     }
 
-    public function addCookieBar(\Contao\PageModel $objPage, \Contao\LayoutModel $objLayout, \Contao\PageRegular $objPageRegular)
+    public function addCookieBar(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
     {
         $objParentPages = PageModel::findParentsById($objPage->id);
 
@@ -127,12 +123,12 @@ class CookieBar extends Frontend
         $arrOptions = [
             'theme' => $arrRootPage['cookieBarTheme'],
             'content' => [
-                'header' => $arrRootPage['cookieBarHeader'],
-                'message' => $arrRootPage['cookieBarMessage'],
-                'dismiss' => $arrRootPage['cookieBarDismiss'],
-                'link' => $arrRootPage['cookieBarLink'],
-                'close' => $arrRootPage['cookieBarClose'],
-                'href' => $arrRootPage['cookieBarHref'],
+                'header' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarHeader'])),
+                'message' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarMessage'])),
+                'dismiss' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarDismiss'])),
+                'link' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarLink'])),
+                'close' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarClose'])),
+                'href' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarHref'])),
             ],
             'type' => $arrRootPage['cookieBarType'],
             'layout' => $arrRootPage['cookieBarLayout'],
@@ -140,8 +136,8 @@ class CookieBar extends Frontend
             'cookie' => [
                 'name' => $arrRootPage['cookieBarCookieName'],
                 'path' => $arrRootPage['cookieBarCookiePath'],
-                'domain' => $arrRootPage['cookieBarCookieDomain'],
-                'expiryDays' => \intval($arrRootPage['cookieBarCookieExpiryDays'], 10),
+                'domain' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarCookieDomain'])),
+                'expiryDays' => (int) $arrRootPage['cookieBarCookieExpiryDays'],
             ],
         ];
 
@@ -154,19 +150,19 @@ class CookieBar extends Frontend
 
         if ('custom' === $arrRootPage['cookieBarPalette']) {
             if ('' !== $arrRootPage['cookieBarPaletteBanner']) {
-                $arrOptions['palette']['popup']['background'] = '#'.deserialize($arrRootPage['cookieBarPaletteBanner'])[0].deserialize($arrRootPage['cookieBarPaletteBanner'])[1];
+                $arrOptions['palette']['popup']['background'] = '#'.StringUtil::deserialize($arrRootPage['cookieBarPaletteBanner'])[0].StringUtil::deserialize($arrRootPage['cookieBarPaletteBanner'])[1];
             }
 
             if ('' !== $arrRootPage['cookieBarPaletteBannerText']) {
-                $arrOptions['palette']['popup']['text'] = '#'.deserialize($arrRootPage['cookieBarPaletteBannerText'])[0].deserialize($arrRootPage['cookieBarPaletteBannerText'])[1];
+                $arrOptions['palette']['popup']['text'] = '#'.StringUtil::deserialize($arrRootPage['cookieBarPaletteBannerText'])[0].StringUtil::deserialize($arrRootPage['cookieBarPaletteBannerText'])[1];
             }
 
             if ('' !== $arrRootPage['cookieBarPaletteButton']) {
-                $arrOptions['palette']['button']['background'] = '#'.deserialize($arrRootPage['cookieBarPaletteButton'])[0].deserialize($arrRootPage['cookieBarPaletteButton'])[1];
+                $arrOptions['palette']['button']['background'] = '#'.StringUtil::deserialize($arrRootPage['cookieBarPaletteButton'])[0].StringUtil::deserialize($arrRootPage['cookieBarPaletteButton'])[1];
             }
 
             if ('' !== $arrRootPage['cookieBarPaletteButtonText']) {
-                $arrOptions['palette']['button']['text'] = '#'.deserialize($arrRootPage['cookieBarPaletteButtonText'])[0].deserialize($arrRootPage['cookieBarPaletteButtonText'])[1];
+                $arrOptions['palette']['button']['text'] = '#'.StringUtil::deserialize($arrRootPage['cookieBarPaletteButtonText'])[0].StringUtil::deserialize($arrRootPage['cookieBarPaletteButtonText'])[1];
             }
         }
 
