@@ -7,6 +7,8 @@
  * @link       http://github.com/trilobit-gmbh/contao-cookiebar-bundle
  */
 
+use Trilobit\CookiebarBundle\CookieBar;
+
 $GLOBALS['TL_DCA']['tl_page']['subpalettes']['addCookieBar'] = ''
     .',cookieBarPosition'
     .',cookieBarTheme'
@@ -16,7 +18,7 @@ $GLOBALS['TL_DCA']['tl_page']['subpalettes']['addCookieBar'] = ''
 
 $GLOBALS['TL_DCA']['tl_page']['subpalettes']['cookieBarPalette_custom'] = 'cookieBarPaletteBanner,cookieBarPaletteBannerText,cookieBarPaletteButton,cookieBarPaletteButtonText,cookieBarPalettePreview';
 
-foreach (array_keys(\Trilobit\CookiebarBundle\CookieBar::getConfigData()['palette']) as $key) {
+foreach (array_keys(CookieBar::getConfigData()['palette']) as $key) {
     if ('custom' === $key || 'css' === $key) {
         continue;
     }
@@ -55,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['addCookieBar'] = [
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPalette'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPalette'],
     'inputType' => 'select',
-    'options_callback' => ['\Trilobit\CookiebarBundle\CookieBar', 'getCookiebarPalette'],
+    'options_callback' => [CookieBar::class, 'getCookiebarPalette'],
     'reference' => &$GLOBALS['TL_LANG']['tl_page']['options']['cookieBarPalette'],
     'eval' => ['mandatory' => true, 'submitOnChange' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
     'sql' => "char(64) NOT NULL default ''",
@@ -63,14 +65,14 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPalette'] = [
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPalettePreview'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPalettePreview'],
-    'input_field_callback' => ['\Trilobit\CookiebarBundle\CookieBar', 'previewPalette'],
+    'input_field_callback' => [CookieBar::class, 'previewPalette'],
     'eval' => ['doNotShow' => true],
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarTheme'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarTheme'],
     'inputType' => 'select',
-    'options_callback' => ['\Trilobit\CookiebarBundle\CookieBar', 'getCookiebarTheme'],
+    'options_callback' => [CookieBar::class, 'getCookiebarTheme'],
     'reference' => &$GLOBALS['TL_LANG']['tl_page']['options']['cookieBarTheme'],
     'eval' => ['mandatory' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
     'sql' => "char(64) NOT NULL default ''",
@@ -107,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPaletteButtonText'] = [
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPosition'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPosition'],
     'inputType' => 'select',
-    'options_callback' => ['\Trilobit\CookiebarBundle\CookieBar', 'getCookiebarPosition'],
+    'options_callback' => [CookieBar::class, 'getCookiebarPosition'],
     'reference' => &$GLOBALS['TL_LANG']['tl_page']['options']['cookieBarPosition'],
     'eval' => ['mandatory' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
     'sql' => "char(64) NOT NULL default ''",
@@ -182,28 +184,3 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarCookieExpiryDays'] = [
     'eval' => ['rgxp' => 'natural', 'maxlength' => 3, 'tl_class' => 'w50'],
     'sql' => "smallint(5) unsigned NOT NULL default '365'",
 ];
-
-/**
- * Class tl_page_cookiebar.
- *
- * Provide miscellaneous methods that are used by the data configuration array.
- */
-class tl_page_cookiebar extends Backend
-{
-    /**
-     * Import the back end user object.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    /**
-     * @return string
-     */
-    public function pagePicker(DataContainer $dc)
-    {
-        return ' <a href="'.(('' === $dc->value || false !== strpos($dc->value, '{{link_url::')) ? 'contao/page.php' : 'contao/file.php').'?do='.Input::get('do').'&amp;table='.$dc->table.'&amp;field='.$dc->field.'&amp;value='.rawurlencode(str_replace(['{{link_url::', '}}'], '', $dc->value)).'&amp;switch=1'.'" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['pagepicker']).'" onclick="Backend.getScrollOffset();Backend.openModalSelector({\'width\':768,\'title\':\''.specialchars(str_replace("'", "\\'", $GLOBALS['TL_LANG']['MOD']['page'][0])).'\',\'url\':this.href,\'id\':\''.$dc->field.'\',\'tag\':\'ctrl_'.$dc->field.(('editAll' === Input::get('act')) ? '_'.$dc->id : '').'\',\'self\':this});return false">'.Image::getHtml('pickpage.gif', $GLOBALS['TL_LANG']['MSC']['pagepicker'], 'style="vertical-align:top;cursor:pointer"').'</a>';
-    }
-}

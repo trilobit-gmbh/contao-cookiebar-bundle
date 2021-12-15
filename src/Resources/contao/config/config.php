@@ -7,10 +7,13 @@
  * @link       http://github.com/trilobit-gmbh/contao-cookiebar-bundle
  */
 
-/**
+/*
  * Register hook.
  */
-$GLOBALS['TL_HOOKS']['generatePage'][] = ['Trilobit\CookiebarBundle\CookieBar', 'addCookieBar'];
+
+use Trilobit\CookiebarBundle\CookieBar;
+
+$GLOBALS['TL_HOOKS']['generatePage'][] = [CookieBar::class, 'addCookieBar'];
 
 define('TRILOBIT_COOKIEBAR_ASSETS', 'bundles/trilobitcookiebar/assets/build');
 
