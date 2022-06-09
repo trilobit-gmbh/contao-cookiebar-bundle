@@ -7,7 +7,21 @@
  * @link       http://github.com/trilobit-gmbh/contao-cookiebar-bundle
  */
 
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Trilobit\CookiebarBundle\CookieBar;
+
+PaletteManipulator::create()
+    ->addLegend('cookiebar_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+    ->addField(['addCookieBar'], 'cookiebar_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('regular', 'tl_page')
+;
+
+PaletteManipulator::create()
+    ->addLegend('cookiebar_legend', 'meta_legend', PaletteManipulator::POSITION_BEFORE)
+    ->addField(['addCookieBar'], 'cookiebar_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('root', 'tl_page')
+    ->applyToPalette('rootfallback', 'tl_page')
+;
 
 $GLOBALS['TL_DCA']['tl_page']['subpalettes']['addCookieBar'] = ''
     .',cookieBarPosition'
@@ -27,21 +41,6 @@ foreach (array_keys(CookieBar::getConfigData()['palette']) as $key) {
 
 $GLOBALS['TL_DCA']['tl_page']['palettes']['__selector__'][] = 'addCookieBar';
 $GLOBALS['TL_DCA']['tl_page']['palettes']['__selector__'][] = 'cookieBarPalette';
-
-/*
- * Palettes
- */
-$GLOBALS['TL_DCA']['tl_page']['palettes']['root'] = str_replace(
-    ';{dns_legend',
-    ';{cookiebar_legend},addCookieBar;{dns_legend',
-    $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
-);
-
-$GLOBALS['TL_DCA']['tl_page']['palettes']['rootfallback'] = str_replace(
-    ';{dns_legend',
-    ';{cookiebar_legend},addCookieBar;{dns_legend',
-    $GLOBALS['TL_DCA']['tl_page']['palettes']['rootfallback']
-);
 
 /*
  * Fields
@@ -64,13 +63,11 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPalette'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPalettePreview'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPalettePreview'],
     'input_field_callback' => [CookieBar::class, 'previewPalette'],
     'eval' => ['doNotShow' => true],
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarTheme'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarTheme'],
     'inputType' => 'select',
     'options_callback' => [CookieBar::class, 'getCookiebarTheme'],
     'reference' => &$GLOBALS['TL_LANG']['tl_page']['options']['cookieBarTheme'],
@@ -79,35 +76,30 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarTheme'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPaletteBanner'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPaletteBanner'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'clr w50 wizard'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPaletteButton'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPaletteButton'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'clr w50 wizard'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPaletteBannerText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPaletteBannerText'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPaletteButtonText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPaletteButtonText'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPosition'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarPosition'],
     'inputType' => 'select',
     'options_callback' => [CookieBar::class, 'getCookiebarPosition'],
     'reference' => &$GLOBALS['TL_LANG']['tl_page']['options']['cookieBarPosition'],
@@ -116,70 +108,60 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarPosition'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarMessage'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarMessage'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarHeader'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarHeader'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarClose'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarClose'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarDismiss'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarDismiss'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarHref'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarHref'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 255, 'dcaPicker' => true, 'tl_class' => 'clr w50 wizard'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarLink'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarLink'],
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarCookieName'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarCookieName'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql' => "varchar(255) NOT NULL default 'cookieconsent_status'",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarCookiePath'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarCookiePath'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql' => "varchar(255) NOT NULL default '/'",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarCookieDomain'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarCookieDomain'],
     'inputType' => 'text',
     'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cookieBarCookieExpiryDays'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_page']['cookieBarCookieExpiryDays'],
     'inputType' => 'text',
     'eval' => ['rgxp' => 'natural', 'maxlength' => 3, 'tl_class' => 'w50'],
     'sql' => "smallint(5) unsigned NOT NULL default '365'",
