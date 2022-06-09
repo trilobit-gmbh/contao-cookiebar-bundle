@@ -86,11 +86,11 @@ class CookieBar extends Frontend
             .'<div class="clr w50 wizard widget inline">'
             .'<h3><label>'.$GLOBALS['TL_LANG']['tl_page']['cookieBarPalettePreview'][0].'</label></h3>'
             .'<div class="theme-preview-container" style="background:'.$arrData['popup']['background'].'">'
-            .'<p style="color:'.$arrData['popup']['text'].'">'
+            .'<p style="color:'.($arrData['popup']['text'] ?? '').'">'
             .$dc->activeRecord->cookieBarMessage
             .'</p>'
             .'<div class="theme-preview-button" style="background:'.$arrData['button']['background'].'">'
-            .'<p style="color:'.$arrData['button']['text'].'">'
+            .'<p style="color:'.($arrData['button']['text'] ?? '').'">'
             .$dc->activeRecord->cookieBarDismiss
             .'</p>'
             .'</div>'
