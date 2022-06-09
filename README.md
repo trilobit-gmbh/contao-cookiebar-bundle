@@ -34,3 +34,4 @@ Compatibility
 -------------
 
 - Contao version ~4.4
+- Contao version ~4.9
