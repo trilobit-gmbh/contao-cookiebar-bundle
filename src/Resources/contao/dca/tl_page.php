@@ -16,12 +16,20 @@ PaletteManipulator::create()
     ->applyToPalette('regular', 'tl_page')
 ;
 
-PaletteManipulator::create()
-    ->addLegend('cookiebar_legend', 'meta_legend', PaletteManipulator::POSITION_BEFORE)
-    ->addField(['addCookieBar'], 'cookiebar_legend', PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette('root', 'tl_page')
-    ->applyToPalette('rootfallback', 'tl_page')
-;
+if (array_key_exists('rootfallback', $GLOBALS['TL_DCA']['tl_page']['palettes'])) {
+    PaletteManipulator::create()
+        ->addLegend('cookiebar_legend', 'meta_legend', PaletteManipulator::POSITION_BEFORE)
+        ->addField(['addCookieBar'], 'cookiebar_legend', PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('root', 'tl_page')
+        ->applyToPalette('rootfallback', 'tl_page')
+    ;
+} else {
+    PaletteManipulator::create()
+        ->addLegend('cookiebar_legend', 'meta_legend', PaletteManipulator::POSITION_BEFORE)
+        ->addField(['addCookieBar'], 'cookiebar_legend', PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('root', 'tl_page')
+    ;
+}
 
 $GLOBALS['TL_DCA']['tl_page']['subpalettes']['addCookieBar'] = ''
     .',cookieBarPosition'
