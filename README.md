@@ -37,7 +37,4 @@ Compatibility
 - Contao version ~4.9
 - Contao version ~4.13
 
-[^1]:
-Diese Contao-Version wird bei den nächsten Updates nicht mehr berücksichtigt.
-
-This Contao version will no longer be included in the next updates.
+[^1]: Diese Contao-Version wird bei den nächsten Updates nicht mehr berücksichtigt. / This Contao version will no longer be included in the next updates.
