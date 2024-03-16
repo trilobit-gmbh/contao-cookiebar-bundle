@@ -11,6 +11,7 @@
  * Register hook.
  */
 
+use Contao\System;
 use Trilobit\CookiebarBundle\CookieBar;
 
 $GLOBALS['TL_HOOKS']['generatePage'][] = [CookieBar::class, 'addCookieBar'];
@@ -20,6 +21,8 @@ define('TRILOBIT_COOKIEBAR_ASSETS', 'bundles/trilobitcookiebar/assets/build');
 /*
  * Add css
  */
-if (TL_MODE === 'BE') {
+$request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+if (null !== $request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
     $GLOBALS['TL_CSS'][] = 'bundles/trilobitcookiebar/css/backend.css';
 }

@@ -33,8 +33,5 @@ Install the extension via composer: [trilobit-gmbh/contao-cookiebar-bundle](http
 Compatibility
 -------------
 
-- Contao version ~4.4 [^1]
-- Contao version ~4.9
 - Contao version ~4.13
-
-[^1]: Diese Contao-Version wird bei den nächsten Updates nicht mehr berücksichtigt. / This Contao version will no longer be included in the next updates.
+- Contao version ~5.0
