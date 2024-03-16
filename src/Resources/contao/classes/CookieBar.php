@@ -13,13 +13,13 @@
 
 namespace Trilobit\CookiebarBundle;
 
-use Contao\Controller;
 use Contao\DataContainer;
 use Contao\Frontend;
 use Contao\LayoutModel;
 use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\StringUtil;
+use Contao\System;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -118,17 +118,15 @@ class CookieBar extends Frontend
         $arrRootPage['cookieBarCookieDomain'] = !empty($arrRootPage['cookieBarCookieDomain']) ? $arrRootPage['cookieBarCookieDomain'] : '';
         $arrRootPage['cookieBarCookieExpiryDays'] = !empty($arrRootPage['cookieBarCookieExpiryDays']) ? $arrRootPage['cookieBarCookieExpiryDays'] : '30';
 
-        $arrPalette = [];
-
         $arrOptions = [
             'theme' => $arrRootPage['cookieBarTheme'],
             'content' => [
-                'header' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarHeader'])),
-                'message' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarMessage'])),
-                'dismiss' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarDismiss'])),
-                'link' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarLink'])),
-                'close' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarClose'])),
-                'href' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarHref'])),
+                'header' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarHeader'])),
+                'message' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarMessage'])),
+                'dismiss' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarDismiss'])),
+                'link' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarLink'])),
+                'close' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarClose'])),
+                'href' => trim(System::getContainer()->get('contao.insert_tag.parser')->replaceInline($arrRootPage['cookieBarHref'])),
             ],
             'type' => $arrRootPage['cookieBarType'],
             'layout' => $arrRootPage['cookieBarLayout'],
@@ -136,7 +134,7 @@ class CookieBar extends Frontend
             'cookie' => [
                 'name' => $arrRootPage['cookieBarCookieName'],
                 'path' => $arrRootPage['cookieBarCookiePath'],
-                'domain' => trim(Controller::replaceInsertTags($arrRootPage['cookieBarCookieDomain'])),
+                'domain' => trim($arrRootPage['cookieBarCookieDomain']),
                 'expiryDays' => (int) $arrRootPage['cookieBarCookieExpiryDays'],
             ],
         ];
@@ -168,7 +166,7 @@ class CookieBar extends Frontend
 
         $GLOBALS['TL_HEAD']['cookieconsent'] = "<script>\n"
             ."window.addEventListener(\"load\", function() {\n"
-            .'window.cookieconsent.initialise('.Controller::replaceInsertTags(json_encode($arrOptions)).");\n"
+            .'window.cookieconsent.initialise('.System::getContainer()->get('contao.insert_tag.parser')->replaceInline(json_encode($arrOptions)).");\n"
             ."});\n"
             .'</script>'
         ;
